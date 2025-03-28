@@ -14,11 +14,14 @@ export const TodoCard = ({ todo, onRemove }: TodoCardProps) => {
 	useEffect(() => {
 		const card = cardRef.current;
 		if (card) {
-			// Trigga reflow för att säkerställa att övergången fungerar
-			// Detta är nödvändigt för att browsern ska "se" initialstaten innan animation
-			void card.offsetWidth;
-			// Lägger till klassen som aktiverar den synliga tillståndet (opacity: 1, transform: translateY(0))
-			card.classList.add("todo-card--visible");
+			// Använder requestAnimationFrame för att säkerställa att initialvärden renderas först
+			requestAnimationFrame(() => {
+				// Använder ytterligare en requestAnimationFrame för att garantera att nästa frame
+				// har tid att rendera innan vi lägger till klassen
+				requestAnimationFrame(() => {
+					card.classList.add("todo-card--visible");
+				});
+			});
 		}
 	}, []);
 
@@ -26,22 +29,15 @@ export const TodoCard = ({ todo, onRemove }: TodoCardProps) => {
 		const card = cardRef.current;
 		if (card) {
 			// Starta fade-out animationen genom att ta bort visible-klassen
-			// Detta återställer till opacity: 0 och transform: translateY(10px)
 			card.classList.remove("todo-card--visible");
-
-			// Vänta tills animationen är klar innan kortet tas bort från DOM
-			// transitionend-eventet triggas när CSS-transitionen är färdig
-			card.addEventListener(
-				"transitionend",
-				() => {
-					onRemove(todo.id);
-				},
-				{ once: true }
-			);
 		} else {
 			// Om ref inte är tillgänglig, ta bort direkt
 			onRemove(todo.id);
 		}
+	};
+
+	const handleTransitionEnd = (): void => {
+		onRemove(todo.id);
 	};
 
 	const formattedDate = new Intl.DateTimeFormat("sv-SE", {
@@ -52,7 +48,11 @@ export const TodoCard = ({ todo, onRemove }: TodoCardProps) => {
 	}).format(todo.createdAt);
 
 	return (
-		<div ref={cardRef} className="todo-card">
+		<div
+			ref={cardRef}
+			className="todo-card"
+			onTransitionEnd={handleTransitionEnd}
+		>
 			<button
 				type="button"
 				className="todo-card__remove"
