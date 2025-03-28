@@ -1,0 +1,24 @@
+.todo-container {
+	max-width: 600px;
+	margin: 0 auto;
+	padding: 2rem;
+
+	&__title {
+		margin-top: 0;
+		margin-bottom: 1.5rem;
+		color: #2c3e50;
+		font-size: 1.75rem;
+		text-align: center;
+	}
+
+	&__list {
+		min-height: 200px;
+	}
+
+	&__empty {
+		text-align: center;
+		color: #95a5a6;
+		font-style: italic;
+		padding: 2rem 0;
+	}
+}
