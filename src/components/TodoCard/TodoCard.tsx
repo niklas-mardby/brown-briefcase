@@ -37,7 +37,8 @@ export const TodoCard = ({ todo, onRemove }: TodoCardProps) => {
 	};
 
 	const handleTransitionEnd = (): void => {
-		onRemove(todo.id);
+		if (!cardRef.current?.classList.contains("todo-card--visible"))
+			onRemove(todo.id);
 	};
 
 	const formattedDate = new Intl.DateTimeFormat("sv-SE", {
